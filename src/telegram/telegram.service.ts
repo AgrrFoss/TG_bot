@@ -17,9 +17,10 @@ export class TelegramService {
   }
 
   async sendMessage(chatId: number, text: string): Promise<any> {
+    console.log(' получаемый айдишник чата', chatId);
     try {
       const response = await axios.post(`${this.telegramApiUrl}/sendMessage`, {
-        chatId,
+        chat_id: chatId,
         text,
       });
       return response;
@@ -53,6 +54,7 @@ export class TelegramService {
 
   async handleUpdate(update: any) {
     this.logger.log('Received Telegram update:', JSON.stringify(update));
+    console.log(update);
 
     if (update.message) {
       const { chat, from, text } = update.message;
