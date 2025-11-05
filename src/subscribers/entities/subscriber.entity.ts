@@ -22,6 +22,21 @@ export class Subscriber {
   @Column({ nullable: true })
   username: string;
 
+  @Column({ nullable: true })
+  avatar: string;
+
+  @Column('simple-array')
+  themes: string[];
+
+  @Column({ nullable: true })
+  utmSource: string;
+
+  @Column({ nullable: true })
+  utmMedium: string;
+
+  @Column({ nullable: true })
+  utmCampaign: string;
+
   @CreateDateColumn()
   subscribedAt: Date;
 }

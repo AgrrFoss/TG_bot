@@ -13,11 +13,17 @@ export class SubscribersService {
   ) {}
 
   async createOrUpdate(
-    telegramId: number,
-    firstName?: string,
-    lastName?: string,
-    username?: string,
+    createSubscriberDto: CreateSubscriberDto,
   ): Promise<Subscriber> {
+    const {
+      telegramId,
+      firstName,
+      lastName,
+      username,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+    } = createSubscriberDto;
     let subscriber = await this.subscriberRepository.findOne({
       where: { telegramId },
     });
@@ -28,12 +34,18 @@ export class SubscribersService {
         firstName,
         lastName,
         username,
+        utmSource,
+        utmMedium,
+        utmCampaign,
       });
     } else {
       // Обновляем данные, если они изменились
       subscriber.firstName = firstName || subscriber.firstName;
       subscriber.lastName = lastName || subscriber.lastName;
       subscriber.username = username || subscriber.username;
+      subscriber.utmSource = utmSource || subscriber.utmSource;
+      subscriber.utmMedium = utmMedium || subscriber.utmMedium;
+      subscriber.utmCampaign = utmCampaign || subscriber.utmCampaign;
     }
 
     return this.subscriberRepository.save(subscriber);
@@ -47,8 +59,7 @@ export class SubscribersService {
     return this.subscriberRepository.findOne({ where: { telegramId } });
   }
 
-
-    create(createSubscriberDto: CreateSubscriberDto) {
+  create(createSubscriberDto: CreateSubscriberDto) {
     return 'This action adds a new subscriber';
   }
 
