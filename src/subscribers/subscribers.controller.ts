@@ -1,15 +1,8 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, Delete, Get } from '@nestjs/common';
 import { SubscribersService } from './subscribers.service';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
+import { RemoveSeveralDto } from './dto/removeSeveral-subscribers.dto';
 
 @Controller('subscribers')
 export class SubscribersController {
@@ -17,7 +10,7 @@ export class SubscribersController {
 
   @Post()
   create(@Body() createSubscriberDto: CreateSubscriberDto) {
-    return this.subscribersService.create(createSubscriberDto);
+    return this.subscribersService.createOrUpdate(createSubscriberDto);
   }
 
   @Get()
@@ -27,16 +20,29 @@ export class SubscribersController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.subscribersService.findOne(+id);
+    return this.subscribersService.findByTelegramId(+id);
+  }
+
+  @Get(':username')
+  findOneByUserName(@Param('username') username: string) {
+    return this.subscribersService.findByUserName(username);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubscriberDto: UpdateSubscriberDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateSubscriberDto: UpdateSubscriberDto,
+  ) {
     return this.subscribersService.update(+id, updateSubscriberDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.subscribersService.remove(+id);
+  }
+
+  @Post('/removeSeveral')
+  removeSeveral(@Body() { ids }: RemoveSeveralDto) {
+    return this.subscribersService.removeSeveral(ids);
   }
 }

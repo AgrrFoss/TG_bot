@@ -29,11 +29,11 @@ export class BotUpdate {
       utmTerms.utmCampaign = parsedUtmTerms.ucm || '';
     }
     const newSubscriber = {
-      telegramId: user.id,
+      id: user.id,
       firstName: user.first_name || 'Неизвестно',
       lastName: user.last_name || 'Неизвестно',
       username: user.username || undefined,
-      utmSource: utmTerms.utmCampaign,
+      utmSource: utmTerms.utmSource,
       utmMedium: utmTerms.utmMedium,
       utmCampaign: utmTerms.utmCampaign,
     };

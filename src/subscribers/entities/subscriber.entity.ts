@@ -1,17 +1,16 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  OneToMany,
+  PrimaryColumn,
 } from 'typeorm';
+import { Application } from '../../applications/entities/application.entity';
 
 @Entity('subscribers') // Имя таблицы в БД
 export class Subscriber {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn({ unique: true }) // Telegram ID пользователя уникален
   id: number;
-
-  @Column({ unique: true }) // Telegram ID пользователя уникален
-  telegramId: number;
 
   @Column({ nullable: true })
   firstName: string;
@@ -23,20 +22,32 @@ export class Subscriber {
   username: string;
 
   @Column({ nullable: true })
-  avatar: string;
-
-  @Column('simple-array')
-  themes: string[];
+  photoUrl: string;
 
   @Column({ nullable: true })
-  utmSource: string;
+  phoneNumber: string;
+
+  @Column('simple-array', { nullable: true })
+  themes?: string[];
 
   @Column({ nullable: true })
-  utmMedium: string;
+  isStudent?: boolean;
+
+  @Column({ nullable: true, default: false })
+  unsubscribed?: boolean;
 
   @Column({ nullable: true })
-  utmCampaign: string;
+  utmSource?: string;
+
+  @Column({ nullable: true })
+  utmMedium?: string;
+
+  @Column({ nullable: true })
+  utmCampaign?: string;
 
   @CreateDateColumn()
   subscribedAt: Date;
+
+  @OneToMany(() => Application, (application) => application.id)
+  applications: Application[];
 }

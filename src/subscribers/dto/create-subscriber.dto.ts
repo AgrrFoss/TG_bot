@@ -2,7 +2,7 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateSubscriberDto {
   @IsNumber()
-  telegramId: number;
+  id: number;
 
   @IsString()
   firstName?: string;
@@ -13,6 +13,14 @@ export class CreateSubscriberDto {
   @IsOptional()
   @IsString()
   username?: string;
+
+  @IsOptional()
+  @IsString()
+  phoneNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  photoUrl?: string;
 
   @IsOptional()
   @IsString()

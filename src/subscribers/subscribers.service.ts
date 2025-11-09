@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Subscriber } from './entities/subscriber.entity';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
+// import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
 
 @Injectable()
 export class SubscribersService {
@@ -16,33 +17,38 @@ export class SubscribersService {
     createSubscriberDto: CreateSubscriberDto,
   ): Promise<Subscriber> {
     const {
-      telegramId,
+      id,
       firstName,
       lastName,
       username,
+      phoneNumber,
+      photoUrl,
       utmSource,
       utmMedium,
       utmCampaign,
     } = createSubscriberDto;
     let subscriber = await this.subscriberRepository.findOne({
-      where: { telegramId },
+      where: { id },
     });
 
     if (!subscriber) {
       subscriber = this.subscriberRepository.create({
-        telegramId,
+        id,
         firstName,
         lastName,
         username,
+        phoneNumber,
+        photoUrl,
         utmSource,
         utmMedium,
         utmCampaign,
       });
     } else {
-      // Обновляем данные, если они изменились
       subscriber.firstName = firstName || subscriber.firstName;
       subscriber.lastName = lastName || subscriber.lastName;
       subscriber.username = username || subscriber.username;
+      subscriber.phoneNumber = phoneNumber || subscriber.phoneNumber;
+      subscriber.photoUrl = photoUrl || subscriber.photoUrl;
       subscriber.utmSource = utmSource || subscriber.utmSource;
       subscriber.utmMedium = utmMedium || subscriber.utmMedium;
       subscriber.utmCampaign = utmCampaign || subscriber.utmCampaign;
@@ -55,24 +61,41 @@ export class SubscribersService {
     return this.subscriberRepository.find();
   }
 
-  async findByTelegramId(telegramId: number): Promise<Subscriber | null> {
-    return this.subscriberRepository.findOne({ where: { telegramId } });
+  async findByTelegramId(id: number): Promise<Subscriber | null> {
+    return this.subscriberRepository.findOne({ where: { id } });
   }
 
-  create(createSubscriberDto: CreateSubscriberDto) {
-    return 'This action adds a new subscriber';
+  async findByUserName(username: string): Promise<Subscriber | null> {
+    return this.subscriberRepository.findOne({ where: { username } });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} subscriber`;
+  async update(id: number, updateSubscriberDto: UpdateSubscriberDto) {
+    const { phoneNumber, themes, isStudent, unsubscribed } =
+      updateSubscriberDto;
+    const subscriber = await this.subscriberRepository.findOne({
+      where: { id },
+    });
+    if (!subscriber) {
+      throw new NotFoundException('Subscriber not found');
+    }
+    subscriber.phoneNumber = phoneNumber || subscriber.phoneNumber;
+    subscriber.themes = themes || subscriber.themes;
+    subscriber.isStudent = isStudent || subscriber.isStudent;
+    subscriber.unsubscribed = unsubscribed || subscriber.unsubscribed;
+    return this.subscriberRepository.save(subscriber);
   }
 
-  update(id: number, updateSubscriberDto: UpdateSubscriberDto) {
-    return `This action updates a #${id} subscriber`;
+  async remove(id: number) {
+    const subscriber = await this.subscriberRepository.findOne({
+      where: { id },
+    });
+    if (!subscriber) {
+      throw new NotFoundException('Subscriber not found');
+    }
+    return this.subscriberRepository.remove(subscriber);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} subscriber`;
+  async removeSeveral(ids: number[]) {
+    return this.subscriberRepository.delete({ id: In(ids) });
   }
 }
-

@@ -9,6 +9,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SubscribersModule } from './subscribers/subscribers.module';
 import SnakeNamingStrategy from 'typeorm-naming-strategy';
 import { BotModule } from './bot/bot.module';
+import { ApplicationsModule } from './applications/applications.module';
+import { MessagesModule } from './messages/messages.module';
 
 config();
 const configService = new ConfigService();
@@ -35,7 +37,8 @@ const typeOrmParams: TypeOrmModuleOptions = {
     TypeOrmModule.forRoot(typeOrmParams),
     SubscribersModule,
     BotModule,
-    // TelegramModule,
+    ApplicationsModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
