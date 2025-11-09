@@ -1,5 +1,5 @@
 # Используем базовый образ Node.js с Yarn
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 # Устанавливаем рабочую директорию в контейнере
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN yarn build
 
 # Используем облегченный образ Node.js для запуска приложения
-FROM node:18-alpine AS runner
+FROM node:22-alpine AS runner
 
 # Устанавливаем рабочую директорию в контейнере
 WORKDIR /app
