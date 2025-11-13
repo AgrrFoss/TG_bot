@@ -11,6 +11,7 @@ import SnakeNamingStrategy from 'typeorm-naming-strategy';
 import { BotModule } from './bot/bot.module';
 import { ApplicationsModule } from './applications/applications.module';
 import { MessagesModule } from './messages/messages.module';
+import { AdminModule } from './admin/admin.module';
 
 config();
 const configService = new ConfigService();
@@ -39,6 +40,7 @@ const typeOrmParams: TypeOrmModuleOptions = {
     BotModule,
     ApplicationsModule,
     MessagesModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
