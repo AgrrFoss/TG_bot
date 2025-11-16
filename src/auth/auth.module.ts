@@ -1,22 +1,26 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UsersModule } from '../users/users.module';
+import { AdminsModule } from '../admins/admins.module';
 import { LocalStrategy } from './local.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { config } from 'dotenv';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
 config();
 const configService = new ConfigService();
 const jwtExpires: string = configService.get('JWT_EXPIRES_IN', '1h');
+
 @Module({
   imports: [
-    UsersModule,
+    AdminsModule,
     PassportModule,
+    ConfigModule,
     JwtModule.register({
       secret: configService.get('JWT_SECRET', 'simple_secret'),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
       signOptions: { expiresIn: jwtExpires },
     }),
   ],

@@ -1,28 +1,49 @@
-import { Request, Controller, Post, UseGuards, Body } from '@nestjs/common';
+import {
+  Request,
+  Controller,
+  Post,
+  UseGuards,
+  Body,
+  Res,
+  Req,
+} from '@nestjs/common';
+import { Response } from 'express';
 import { LocalAuthGuard } from './local-auth.guard';
 import { AuthService } from './auth.service';
-import { User } from '../users/entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UsersService } from '../users/users.service';
+import { Admin } from '../admins/entities/admin.entity';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { AdminsService } from '../admins/admins.service';
+import { TelegramLoginDto } from './dto/telegramLogin.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('v1.0/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly userService: UsersService,
+    private readonly adminService: AdminsService,
   ) {}
+
   @UseGuards(LocalAuthGuard)
   @Post('signin')
-  signIn(@Request() req: { user: User }) {
-    return this.authService.login(req.user);
+  signIn(
+    @Req() req: { admin: Admin },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.login(req.admin, res);
   }
 
+  @Post('telegram')
+  async telegramLogin(
+    @Body() { initData }: TelegramLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<Omit<Admin, 'password'> | null> {
+    return this.authService.telegramMiniAppLogin(initData, res);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('signup')
-  signUp(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create({
-      login: createUserDto.username,
-      password: createUserDto.password,
-    });
+  signUp(@Body() createAdminDto: CreateAdminDto) {
+    return this.adminService.create(createAdminDto);
   }
 
   @UseGuards(LocalAuthGuard)
