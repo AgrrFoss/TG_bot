@@ -3,13 +3,12 @@ FROM node:22-alpine AS builder
 
 # Устанавливаем рабочую директорию в контейнере
 WORKDIR /app
-
+ENV NODE_ENV development
 # Копируем package.json и yarn.lock
 COPY package.json yarn.lock ./
 
 # Устанавливаем зависимости с использованием Yarn
 RUN yarn install --frozen-lockfile
-RUN yarn global add @nestjs/cli
 # Копируем исходный код приложения
 COPY . .
 
@@ -21,7 +20,7 @@ FROM node:22-alpine AS runner
 
 # Устанавливаем рабочую директорию в контейнере
 WORKDIR /app
-
+ENV NODE_ENV production
 # Копируем только необходимые файлы из предыдущего этапа (builder)
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
