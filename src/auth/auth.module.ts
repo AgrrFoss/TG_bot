@@ -8,6 +8,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { config } from 'dotenv';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Admin } from '../admins/entities/admin.entity';
 config();
 const configService = new ConfigService();
 const jwtExpires: string = configService.get('JWT_EXPIRES_IN', '1h');
@@ -17,6 +19,7 @@ const jwtExpires: string = configService.get('JWT_EXPIRES_IN', '1h');
     AdminsModule,
     PassportModule,
     ConfigModule,
+    TypeOrmModule.forFeature([Admin]),
     JwtModule.register({
       secret: configService.get('JWT_SECRET', 'simple_secret'),
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
