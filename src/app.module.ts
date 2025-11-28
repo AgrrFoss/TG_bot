@@ -11,6 +11,8 @@ import SnakeNamingStrategy from 'typeorm-naming-strategy';
 import { BotModule } from './bot/bot.module';
 import { ApplicationsModule } from './applications/applications.module';
 import { MessagesModule } from './messages/messages.module';
+import { AdminsModule } from './admins/admins.module';
+import { AuthModule } from './auth/auth.module';
 
 config();
 const configService = new ConfigService();
@@ -27,7 +29,7 @@ const typeOrmParams: TypeOrmModuleOptions = {
   password: configService.get('DB_PASS', '135132'),
   database: configService.get('DB_NAME', 'project_db'),
   entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
-  synchronize: true,
+  synchronize: configService.get('NODE_ENV') !== 'production',
   namingStrategy: new SnakeNamingStrategy(),
 };
 
@@ -39,6 +41,8 @@ const typeOrmParams: TypeOrmModuleOptions = {
     BotModule,
     ApplicationsModule,
     MessagesModule,
+    AdminsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
