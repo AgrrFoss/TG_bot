@@ -10,6 +10,12 @@ COPY package.json yarn.lock ./
 # Устанавливаем зависимости с использованием Yarn
 RUN yarn install --frozen-lockfile
 
+# --- ДОБАВЬТЕ ЭТИ ШАГИ ДЛЯ ОТЛАДКИ ---
+RUN ls -l node_modules/.bin/nest
+RUN echo $PATH
+RUN node_modules/.bin/nest --version
+# --- КОНЕЦ ШАГОВ ОТЛАДКИ ---
+
 # Копируем исходный код приложения
 COPY . .
 
