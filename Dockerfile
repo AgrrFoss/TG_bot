@@ -9,7 +9,7 @@ COPY package.json yarn.lock ./
 
 # Устанавливаем зависимости с использованием Yarn
 RUN yarn install --frozen-lockfile
-
+RUN yarn global add @nestjs/cli
 # Копируем исходный код приложения
 COPY . .
 
