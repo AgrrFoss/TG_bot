@@ -29,7 +29,7 @@ const typeOrmParams: TypeOrmModuleOptions = {
   password: configService.get('DB_PASS', '135132'),
   database: configService.get('DB_NAME', 'project_db'),
   entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
-  synchronize: true,
+  synchronize: configService.get('NODE_ENV') !== 'production',
   namingStrategy: new SnakeNamingStrategy(),
 };
 
