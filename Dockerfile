@@ -14,7 +14,7 @@ RUN yarn install --frozen-lockfile
 COPY . .
 
 # Собираем приложение для продакшена
-RUN yarn build
+RUN yarn run build
 
 # Используем облегченный образ Node.js для запуска приложения
 FROM node:22-alpine AS runner
