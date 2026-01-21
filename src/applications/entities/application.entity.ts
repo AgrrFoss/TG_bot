@@ -13,7 +13,7 @@ export class Application {
   id: number;
 
   @ManyToOne(() => Subscriber, (subscriber) => subscriber.id)
-  telegramUser: Subscriber;
+  subscriber: Subscriber;
 
   @Column()
   name: string;

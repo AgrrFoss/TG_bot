@@ -6,6 +6,7 @@ import {
   Body,
   Res,
   Req,
+  Get,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { LocalAuthGuard } from './local-auth.guard';
@@ -23,13 +24,19 @@ export class AuthController {
     private readonly adminService: AdminsService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getMe(@Req() req: { user: Admin }) {
+    return this.adminService.findOne(req.user.id);
+  }
+
   @UseGuards(LocalAuthGuard)
   @Post('signin')
   signIn(
-    @Req() req: { admin: Admin },
+    @Req() req: { user: Admin },
     @Res({ passthrough: true }) res: Response,
   ) {
-    return this.authService.login(req.admin, res);
+    return this.authService.login(req.user, res);
   }
 
   @Post('telegram')

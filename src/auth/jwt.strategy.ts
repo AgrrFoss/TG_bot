@@ -21,7 +21,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: configService.get('JWT_SECRET', 'simple_secret'),
     });
   }
-
   async validate(payload: { sub: string }) {
     const foundAdmin = await this.adminRepository.findOne({
       where: { id: payload.sub },

@@ -37,7 +37,13 @@ export class AuthService {
     res: Response,
   ): Promise<{ access_token: string }> {
     const payload = { sub: admin.id };
-    res.cookie('jwt', this.jwtService.sign(payload), { httpOnly: true });
+    res.cookie('jwt', this.jwtService.sign(payload), {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+      path: '/',
+      domain: '.cloudpub.ru',
+    });
     return {
       access_token: this.jwtService.sign(payload),
     };

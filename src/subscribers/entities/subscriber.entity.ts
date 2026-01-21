@@ -3,14 +3,20 @@ import {
   Column,
   CreateDateColumn,
   OneToMany,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Application } from '../../applications/entities/application.entity';
 
 @Entity('subscribers') // Имя таблицы в БД
 export class Subscriber {
-  @PrimaryColumn({ unique: true }) // Telegram ID пользователя уникален
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ unique: true, nullable: true }) // Telegram ID пользователя уникален
+  tgId?: number;
+
+  @Column({ unique: true, nullable: true }) // Vkontakte ID пользователя уникален
+  vkId?: number;
 
   @Column({ nullable: true })
   firstName: string;

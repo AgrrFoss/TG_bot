@@ -47,7 +47,6 @@ export class AdminsService {
       email: createAdminDto?.accessData?.email,
       password: createAdminDto?.accessData?.password,
     };
-    console.log(createAdminDto);
     return this.adminsRepository.save(newAdmin);
   }
 
@@ -55,8 +54,8 @@ export class AdminsService {
     return `This action returns all admin`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} admin`;
+  findOne(id: string) {
+    return this.adminsRepository.findOne({ where: { id: id } });
   }
   async findAdmin({
     telegramId,
