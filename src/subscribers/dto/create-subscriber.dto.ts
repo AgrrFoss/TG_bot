@@ -1,8 +1,17 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateSubscriberDto {
+  @IsOptional()
+  @IsString()
+  id?: string;
+
+  @IsOptional()
   @IsNumber()
-  id: number;
+  tgId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  vkId?: number;
 
   @IsString()
   firstName?: string;

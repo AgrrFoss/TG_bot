@@ -29,7 +29,7 @@ export class BotUpdate {
       utmTerms.utmCampaign = parsedUtmTerms.ucm || '';
     }
     const newSubscriber = {
-      id: user.id,
+      tgId: user.id,
       firstName: user.first_name || 'Неизвестно',
       lastName: user.last_name || 'Неизвестно',
       username: user.username || undefined,
@@ -43,7 +43,7 @@ export class BotUpdate {
       console.log(`Subscriber saved/updated: ${JSON.stringify(subscriber)}`);
       // Отправляем приветственное сообщение
       await ctx.reply(
-        `Привет, ${newSubscriber.firstName}! Спасибо за подписку. Ваши данные сохранены.`,
+        `Привет, ${newSubscriber.firstName}! Спасибо за подписку. Будем на связи!`,
       );
     } catch (error) {
       console.error('Ошибка при сохранении подписчика:', error);

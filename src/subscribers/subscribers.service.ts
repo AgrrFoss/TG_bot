@@ -4,7 +4,6 @@ import { In, Repository } from 'typeorm';
 import { Subscriber } from './entities/subscriber.entity';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
-// import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
 
 @Injectable()
 export class SubscribersService {
@@ -18,6 +17,8 @@ export class SubscribersService {
   ): Promise<Subscriber> {
     const {
       id,
+      tgId,
+      vkId,
       firstName,
       lastName,
       username,
@@ -27,13 +28,34 @@ export class SubscribersService {
       utmMedium,
       utmCampaign,
     } = createSubscriberDto;
-    let subscriber = await this.subscriberRepository.findOne({
-      where: { id },
-    });
-
-    if (!subscriber) {
+    let subscriber: Subscriber | null = null;
+    if (tgId) {
+      subscriber = await this.subscriberRepository.findOne({ where: { tgId } });
+    }
+    if (!subscriber && vkId) {
+      subscriber = await this.subscriberRepository.findOne({ where: { vkId } });
+    }
+    if (!subscriber && id) {
+      subscriber = await this.subscriberRepository.findOne({
+        where: { id },
+      });
+    }
+    if (subscriber) {
+      if (firstName !== undefined) subscriber.firstName = firstName;
+      if (lastName !== undefined) subscriber.lastName = lastName;
+      if (username !== undefined) subscriber.username = username;
+      if (phoneNumber !== undefined) subscriber.phoneNumber = phoneNumber;
+      if (photoUrl !== undefined) subscriber.photoUrl = photoUrl;
+      if (utmSource !== undefined) subscriber.utmSource = utmSource;
+      if (utmMedium !== undefined) subscriber.utmMedium = utmMedium;
+      if (utmCampaign !== undefined) subscriber.utmCampaign = utmCampaign;
+      // Важно: tgId и vkId тоже могут быть частью обновления, если они были null
+      if (tgId !== undefined) subscriber.tgId = tgId;
+      if (vkId !== undefined) subscriber.vkId = vkId;
+    } else {
       subscriber = this.subscriberRepository.create({
-        id,
+        tgId,
+        vkId,
         firstName,
         lastName,
         username,
@@ -43,17 +65,7 @@ export class SubscribersService {
         utmMedium,
         utmCampaign,
       });
-    } else {
-      subscriber.firstName = firstName || subscriber.firstName;
-      subscriber.lastName = lastName || subscriber.lastName;
-      subscriber.username = username || subscriber.username;
-      subscriber.phoneNumber = phoneNumber || subscriber.phoneNumber;
-      subscriber.photoUrl = photoUrl || subscriber.photoUrl;
-      subscriber.utmSource = utmSource || subscriber.utmSource;
-      subscriber.utmMedium = utmMedium || subscriber.utmMedium;
-      subscriber.utmCampaign = utmCampaign || subscriber.utmCampaign;
     }
-
     return this.subscriberRepository.save(subscriber);
   }
 
@@ -61,7 +73,7 @@ export class SubscribersService {
     return this.subscriberRepository.find();
   }
 
-  async findByTelegramId(id: number): Promise<Subscriber | null> {
+  async findByTelegramId(id: string): Promise<Subscriber | null> {
     return this.subscriberRepository.findOne({ where: { id } });
   }
 
@@ -69,7 +81,7 @@ export class SubscribersService {
     return this.subscriberRepository.findOne({ where: { username } });
   }
 
-  async update(id: number, updateSubscriberDto: UpdateSubscriberDto) {
+  async update(id: string, updateSubscriberDto: UpdateSubscriberDto) {
     const { phoneNumber, themes, isStudent, unsubscribed } =
       updateSubscriberDto;
     const subscriber = await this.subscriberRepository.findOne({
@@ -85,7 +97,7 @@ export class SubscribersService {
     return this.subscriberRepository.save(subscriber);
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const subscriber = await this.subscriberRepository.findOne({
       where: { id },
     });

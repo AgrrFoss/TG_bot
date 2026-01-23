@@ -8,8 +8,15 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-
-  app.use(cookieParser(configService.get('')));
+  const cookieSecret = configService.get<string>('COOKIE_SECRET'); // Укажите реальный ключ из .env
+  app.use(cookieParser(cookieSecret));
+  app.enableCors({
+    origin: [
+      // configService.get<string>('FRONT_URL') ||
+      'https://heartlessly-mindful-gunnel.cloudpub.ru',
+    ],
+    credentials: true,
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

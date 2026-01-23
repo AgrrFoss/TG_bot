@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Patch, Param, Delete, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Get,
+} from '@nestjs/common';
 import { SubscribersService } from './subscribers.service';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
@@ -20,7 +28,7 @@ export class SubscribersController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.subscribersService.findByTelegramId(+id);
+    return this.subscribersService.findByTelegramId(id);
   }
 
   @Get(':username')
@@ -33,12 +41,12 @@ export class SubscribersController {
     @Param('id') id: string,
     @Body() updateSubscriberDto: UpdateSubscriberDto,
   ) {
-    return this.subscribersService.update(+id, updateSubscriberDto);
+    return this.subscribersService.update(id, updateSubscriberDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.subscribersService.remove(+id);
+    return this.subscribersService.remove(id);
   }
 
   @Post('/removeSeveral')
