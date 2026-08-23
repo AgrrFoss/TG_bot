@@ -8,11 +8,14 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SubscribersModule } from './subscribers/subscribers.module';
 import SnakeNamingStrategy from 'typeorm-naming-strategy';
-import { BotModule } from './bot/bot.module';
-import { ApplicationsModule } from './applications/applications.module';
+import { TgBotModule } from './tgBot/tgBot.module';
+// import { ApplicationsModule } from './applications/applications.module';
 import { MessagesModule } from './messages/messages.module';
 import { AdminsModule } from './admins/admins.module';
 import { AuthModule } from './auth/auth.module';
+import { VkBotModule } from './vk-bot/vk-bot.module';
+import { VkBotController } from './vk-bot/vk-bot.controller';
+import { VkBotService } from './vk-bot/vk-bot.service';
 
 config();
 const configService = new ConfigService();
@@ -29,6 +32,7 @@ const typeOrmParams: TypeOrmModuleOptions = {
   password: configService.get('DB_PASS', '135132'),
   database: configService.get('DB_NAME', 'project_db'),
   entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
+  // logging: configService.get('NODE_ENV') !== 'production',
   synchronize: configService.get('NODE_ENV') !== 'production',
   namingStrategy: new SnakeNamingStrategy(),
 };
@@ -38,13 +42,14 @@ const typeOrmParams: TypeOrmModuleOptions = {
     ConfigModule.forRoot(configParams),
     TypeOrmModule.forRoot(typeOrmParams),
     SubscribersModule,
-    BotModule,
-    ApplicationsModule,
+    TgBotModule,
+    // ApplicationsModule,
     MessagesModule,
     AdminsModule,
     AuthModule,
+    VkBotModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, VkBotController],
+  providers: [AppService, VkBotService],
 })
 export class AppModule {}

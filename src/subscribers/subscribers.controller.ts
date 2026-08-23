@@ -16,10 +16,10 @@ import { RemoveSeveralDto } from './dto/removeSeveral-subscribers.dto';
 export class SubscribersController {
   constructor(private readonly subscribersService: SubscribersService) {}
 
-  @Post()
-  create(@Body() createSubscriberDto: CreateSubscriberDto) {
-    return this.subscribersService.createOrUpdate(createSubscriberDto);
-  }
+  // @Post()
+  // create(@Body() createSubscriberDto: CreateSubscriberDto) {
+  //   return this.subscribersService.createOrUpdate(createSubscriberDto);
+  // }
 
   @Get()
   findAll() {

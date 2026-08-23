@@ -1,0 +1,176 @@
+OUT  при ответе администратора:
+
+Получаем от Вконтакте: {
+  group_id: 231807015,
+  type: 'message_reply',
+  event_id: 'aa9485addb3f94722fa189c50a81e07eb12218be',
+  v: '5.199',
+  object: {
+    date: 1787475850,
+    from_id: 525593745, // Код администратора
+    id: 718,
+    version: 10002262,
+    out: 1,
+    fwd_messages: [],
+    important: false,
+    is_hidden: false,
+    admin_author_id: 525593745, // Код администратора
+    attachments: [],
+    conversation_message_id: 31,
+    text: 'проверка логов',
+    peer_id: 28681836,
+    random_id: -769455084
+  },
+  secret: 'hgjd5656hdjh64ysdhs'
+}
+
+
+
+
+OUT при ответе бота:
+
+Получаем от Вконтакте: {
+  group_id: 231807015,
+  type: 'message_reply',
+  event_id: 'b3fffa5eeb39cbf17e76e6e9a43a2cd8df84f268',
+  v: '5.199',
+  object: {
+    date: 1787477224,
+    from_id: -231807015, // Код бота
+    id: 769,
+    version: 10002385,
+    out: 1,
+    fwd_messages: [],
+    important: false,
+    is_hidden: false,
+    attachments: [],
+    conversation_message_id: 33,
+    text: 'Привет! Бот на связи.',
+    peer_id: 28681836, // Получатель
+    random_id: -992641384
+  },
+  secret: 'hgjd5656hdjh64ysdhs'
+}
+
+
+
+
+IN:
+
+// уведомление, что сообщение прочитано.
+Получаем от Вконтакте: {
+  group_id: 231807015,
+  type: 'message_read',  // уведомление, что сообщение прочитано.
+  event_id: 'cb7295555ab049d4660bedc498ec314005cd0eac',
+  v: '5.199',
+  object: {
+    from_id: 28681836,
+    peer_id: -231807015,
+    read_message_id: 697,
+    conversation_message_id: 29
+  },
+  secret: 'hgjd5656hdjh64ysdhs'
+}
+Получаем от Вконтакте: {
+  group_id: 231807015,
+  type: 'message_new',
+  event_id: '973a78ecacd7c1d2cb092a822b4020e92d7f9fab',
+  v: '5.199',
+  object: {
+    client_info: {
+      button_actions: [Array],
+      keyboard: true,
+      inline_keyboard: true,
+      carousel: true,
+      lang_id: 0
+    },
+    message: {
+      date: 1787475513,
+      from_id: 28681836,
+      id: 699,
+      version: 10002237,
+      out: 0,
+      fwd_messages: [],
+      important: false,
+      is_hidden: false,
+      attachments: [],
+      conversation_message_id: 30,
+      text: 'ДОбрый вечер',
+      peer_id: 28681836,
+      random_id: 0
+    }
+  },
+  secret: 'hgjd5656hdjh64ysdhs'
+}
+Новое сообщение: ДОбрый вечер
+MessageContext {
+  id: 699,
+  conversationMessageId: 30,
+  peerId: 28681836,
+  peerType: 'user',
+  senderId: 28681836,
+  senderType: 'user',
+  createdAt: 1787475513,
+  updatedAt: undefined,
+  pinnedAt: undefined,
+  text: 'ДОбрый вечер',
+  forwards: MessageForwardsCollection(0) [],
+  attachments: [],
+  isOutbox: false,
+  type: 'message',
+  subTypes: [
+    'message_new'
+  ],
+  state: {}
+}
+
+Связка из сервиса:
+
+Новое сообщение от пользователя: привет
+Полный объект контекста:  MessageContext {
+  id: 773, // ID сообщения
+  conversationMessageId: 34,
+  peerId: 28681836,
+  peerType: 'user',
+  senderId: 28681836,
+  senderType: 'user',
+  createdAt: 1787478487,
+  updatedAt: undefined,
+  pinnedAt: undefined,
+  text: 'привет',
+  forwards: MessageForwardsCollection(0) [],
+  attachments: [],
+  isOutbox: false,
+  type: 'message',
+  subTypes: [
+    'message_new'
+  ],
+  state: {}
+}
+Ответ пользователю: Привет! Бот на связи.
+Полный объект контекста ответа:  MessageContext {
+  id: 774, // ID сообщения
+  conversationMessageId: 35,
+  peerId: 28681836,
+  peerType: 'user',
+  senderId: -231807015,
+  senderType: 'group',
+  createdAt: 1787478488,
+  updatedAt: undefined,
+  pinnedAt: undefined,
+  text: 'Привет! Бот на связи.',
+  forwards: MessageForwardsCollection(0) [],
+  attachments: [],
+  isOutbox: true,
+  type: 'message',
+  subTypes: [
+    'message_reply'
+  ],
+  state: {}
+}
+
+
+
+
+
+

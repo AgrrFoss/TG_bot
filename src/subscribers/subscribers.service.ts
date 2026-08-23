@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Subscriber } from './entities/subscriber.entity';
+import { SubscriberIdentity } from './entities/subscriber-identity.entity';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
 
@@ -10,64 +11,98 @@ export class SubscribersService {
   constructor(
     @InjectRepository(Subscriber)
     private readonly subscriberRepository: Repository<Subscriber>,
+    @InjectRepository(SubscriberIdentity)
+    private readonly identityRepository: Repository<SubscriberIdentity>,
   ) {}
 
-  async createOrUpdate(
-    createSubscriberDto: CreateSubscriberDto,
-  ): Promise<Subscriber> {
-    const {
-      id,
-      tgId,
-      vkId,
-      firstName,
-      lastName,
-      username,
-      phoneNumber,
-      photoUrl,
-      utmSource,
-      utmMedium,
-      utmCampaign,
-    } = createSubscriberDto;
-    let subscriber: Subscriber | null = null;
-    if (tgId) {
-      subscriber = await this.subscriberRepository.findOne({ where: { tgId } });
+  async findOrCreate(
+    platform: string,
+    platformId: string,
+    dto: CreateSubscriberDto,
+  ): Promise<{ subscriber: Subscriber; identity: SubscriberIdentity }> {
+    const existingIdentity = await this.identityRepository.findOne({
+      where: { platform, platformId },
+      relations: ['subscriber'],
+    });
+    if (existingIdentity) {
+      return {
+        subscriber: existingIdentity.subscriber,
+        identity: existingIdentity,
+      };
     }
-    if (!subscriber && vkId) {
-      subscriber = await this.subscriberRepository.findOne({ where: { vkId } });
-    }
-    if (!subscriber && id) {
-      subscriber = await this.subscriberRepository.findOne({
-        where: { id },
-      });
-    }
-    if (subscriber) {
-      if (firstName !== undefined) subscriber.firstName = firstName;
-      if (lastName !== undefined) subscriber.lastName = lastName;
-      if (username !== undefined) subscriber.username = username;
-      if (phoneNumber !== undefined) subscriber.phoneNumber = phoneNumber;
-      if (photoUrl !== undefined) subscriber.photoUrl = photoUrl;
-      if (utmSource !== undefined) subscriber.utmSource = utmSource;
-      if (utmMedium !== undefined) subscriber.utmMedium = utmMedium;
-      if (utmCampaign !== undefined) subscriber.utmCampaign = utmCampaign;
-      // Важно: tgId и vkId тоже могут быть частью обновления, если они были null
-      if (tgId !== undefined) subscriber.tgId = tgId;
-      if (vkId !== undefined) subscriber.vkId = vkId;
-    } else {
-      subscriber = this.subscriberRepository.create({
-        tgId,
-        vkId,
-        firstName,
-        lastName,
-        username,
-        phoneNumber,
-        photoUrl,
-        utmSource,
-        utmMedium,
-        utmCampaign,
-      });
-    }
-    return this.subscriberRepository.save(subscriber);
+    const newSubscriber = this.subscriberRepository.create(dto);
+    const savedSubscriber = await this.identityRepository.save(newSubscriber);
+    console.log(savedSubscriber);
+
+    const newIdentity = new SubscriberIdentity(); // <-- Явный инстанс
+    newIdentity.platform = platform;
+    newIdentity.platformId = platformId;
+    newIdentity.username = dto.username;
+    newIdentity.subscriber = savedSubscriber;
+    const savedIdentity = await this.identityRepository.save(newIdentity);
+    return {
+      subscriber: savedSubscriber,
+      identity: savedIdentity,
+    };
   }
+
+  // Создание или обновление подписчика Метод рассчитанный на получение данных при работе с ТГ заявками из ТГАпп
+  // async createOrUpdate(
+  //   createSubscriberDto: CreateSubscriberDto,
+  // ): Promise<Subscriber> {
+  //   const {
+  //     id,
+  //     // tgId,
+  //     // vkId,
+  //     firstName,
+  //     lastName,
+  //     username,
+  //     phoneNumber,
+  //     photoUrl,
+  //     utmSource,
+  //     utmMedium,
+  //     utmCampaign,
+  //   } = createSubscriberDto;
+  //   let subscriber: Subscriber | null = null;
+  // if (tgId) {
+  //   subscriber = await this.subscriberRepository.findOne({ where: { tgId } });
+  // }
+  // if (!subscriber && vkId) {
+  //   subscriber = await this.subscriberRepository.findOne({ where: { vkId } });
+  // }
+  //   if (!subscriber && id) {
+  //     subscriber = await this.subscriberRepository.findOne({
+  //       where: { id },
+  //     });
+  //   }
+  //   if (subscriber) {
+  //     if (firstName !== undefined) subscriber.firstName = firstName;
+  //     if (lastName !== undefined) subscriber.lastName = lastName;
+  //     if (username !== undefined) subscriber.username = username;
+  //     if (phoneNumber !== undefined) subscriber.phoneNumber = phoneNumber;
+  //     if (photoUrl !== undefined) subscriber.photoUrl = photoUrl;
+  //     if (utmSource !== undefined) subscriber.utmSource = utmSource;
+  //     if (utmMedium !== undefined) subscriber.utmMedium = utmMedium;
+  //     if (utmCampaign !== undefined) subscriber.utmCampaign = utmCampaign;
+  //     // Важно: tgId и vkId тоже могут быть частью обновления, если они были null
+  //     // if (tgId !== undefined) subscriber.tgId = tgId;
+  //     // if (vkId !== undefined) subscriber.vkId = vkId;
+  //   } else {
+  //     subscriber = this.subscriberRepository.create({
+  //       // tgId,
+  //       // vkId,
+  //       firstName,
+  //       lastName,
+  //       username,
+  //       phoneNumber,
+  //       photoUrl,
+  //       utmSource,
+  //       utmMedium,
+  //       utmCampaign,
+  //     });
+  //   }
+  //   return this.subscriberRepository.save(subscriber);
+  // }
 
   async findAll(): Promise<Subscriber[]> {
     return this.subscriberRepository.find();

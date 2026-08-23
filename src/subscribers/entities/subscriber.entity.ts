@@ -1,22 +1,11 @@
-import {
-  Entity,
-  Column,
-  CreateDateColumn,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, Column, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Application } from '../../applications/entities/application.entity';
+import { SubscriberIdentity } from './subscriber-identity.entity';
 
 @Entity('subscribers') // Имя таблицы в БД
 export class Subscriber {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column({ unique: true, nullable: true }) // Telegram ID пользователя уникален
-  tgId?: number;
-
-  @Column({ unique: true, nullable: true }) // Vkontakte ID пользователя уникален
-  vkId?: number;
 
   @Column({ nullable: true })
   firstName: string;
@@ -51,8 +40,11 @@ export class Subscriber {
   @Column({ nullable: true })
   utmCampaign?: string;
 
-  @CreateDateColumn()
-  subscribedAt: Date;
+  @OneToMany(() => SubscriberIdentity, (i) => i.subscriber)
+  identities: SubscriberIdentity[];
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  aiPausedUntil?: Date; // До какого времени ИИ "спит" для этого пользователя
 
   @OneToMany(() => Application, (application) => application.id)
   applications: Application[];

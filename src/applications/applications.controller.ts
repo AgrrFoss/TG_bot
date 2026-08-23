@@ -6,10 +6,10 @@ import { CreateApplicationDto } from './dto/create-application.dto';
 export class ApplicationsController {
   constructor(private readonly applicationsService: ApplicationsService) {}
 
-  @Post()
-  create(@Body() createApplicationDto: CreateApplicationDto) {
-    return this.applicationsService.create(createApplicationDto);
-  }
+  // @Post()
+  // create(@Body() createApplicationDto: CreateApplicationDto) {
+  //   return this.applicationsService.create(createApplicationDto);
+  // }
 
   @Get()
   findAll() {

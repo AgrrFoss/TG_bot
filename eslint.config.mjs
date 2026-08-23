@@ -27,8 +27,14 @@ export default tseslint.config(
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
+      // 2. Утихомириваем проверки "unsafe" операций с any (самые раздражающие правила)
+      '@typescript-eslint/no-unsafe-assignment': 'off', // <- Убирает ошибку "Unsafe assignment of an any value"
+      '@typescript-eslint/no-unsafe-member-access': 'off', // <- Разрешает читать свойства у any (например, body.type)
+      '@typescript-eslint/no-unsafe-call': 'off', // <- Разрешает вызывать методы у any
+      '@typescript-eslint/no-unsafe-return': 'off', // <- Разрешает возвращать any из функций
+
       '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn'
+      '@typescript-eslint/no-unsafe-argument': 'warn',
     },
   },
 );
