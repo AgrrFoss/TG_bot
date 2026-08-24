@@ -31,14 +31,13 @@ export class SubscribersService {
       };
     }
     const newSubscriber = this.subscriberRepository.create(dto);
-    const savedSubscriber = await this.identityRepository.save(newSubscriber);
-    console.log(savedSubscriber);
-
-    const newIdentity = new SubscriberIdentity(); // <-- Явный инстанс
-    newIdentity.platform = platform;
-    newIdentity.platformId = platformId;
-    newIdentity.username = dto.username;
-    newIdentity.subscriber = savedSubscriber;
+    const savedSubscriber = await this.subscriberRepository.save(newSubscriber);
+    const newIdentity = this.identityRepository.create({
+      platform: platform,
+      platformId: platformId,
+      username: dto.username,
+      subscriber: savedSubscriber,
+    });
     const savedIdentity = await this.identityRepository.save(newIdentity);
     return {
       subscriber: savedSubscriber,
@@ -46,6 +45,26 @@ export class SubscribersService {
     };
   }
 
+  async findByPlatform(platform: string, platformId: string) {
+    const identity = await this.identityRepository.findOne({
+      where: { platform, platformId },
+      relations: ['subscriber'],
+    });
+    if (!identity) {
+      return null;
+    }
+    return {
+      subscriber: identity.subscriber,
+      identity: identity,
+    };
+  }
+
+  async updateAiPause(subscriberId: string, minutes: number): Promise<void> {
+    const pausedUntil = new Date(Date.now() + minutes * 60 * 1000);
+    await this.subscriberRepository.update(subscriberId, {
+      aiPausedUntil: pausedUntil,
+    });
+  }
   // Создание или обновление подписчика Метод рассчитанный на получение данных при работе с ТГ заявками из ТГАпп
   // async createOrUpdate(
   //   createSubscriberDto: CreateSubscriberDto,
