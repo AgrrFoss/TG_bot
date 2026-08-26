@@ -11,8 +11,7 @@ export class AppController {
   }
   @Post()
   @HttpCode(200)
-  confirmationVK(@Body() body: any) {
-    console.log('hui', body);
+  confirmationVK() {
     return '1a4b4448';
   }
   @Get('redis-test')

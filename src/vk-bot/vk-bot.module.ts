@@ -1,6 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { VK } from 'vk-io';
 import { AiQueueModule } from '../ai-queue/ai-queue.module';
+import { VkBotController } from './vk-bot.controller';
 
 @Global()
 @Module({
@@ -18,6 +19,7 @@ import { AiQueueModule } from '../ai-queue/ai-queue.module';
       },
     },
   ],
+  controllers: [VkBotController],
   exports: [VK], // Экспортируем класс VK
 })
 export class VkBotModule {}
