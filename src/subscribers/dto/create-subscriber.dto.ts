@@ -1,45 +1,43 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
-
+import {
+  IsOptional,
+  IsString,
+  IsBoolean,
+  IsArray,
+  IsDate,
+} from 'class-validator';
 export class CreateSubscriberDto {
   @IsOptional()
   @IsString()
-  id?: string;
-
-  @IsOptional()
-  @IsNumber()
-  tgId?: number;
-
-  @IsOptional()
-  @IsNumber()
-  vkId?: number;
-
-  @IsString()
   firstName?: string;
-
+  @IsOptional()
   @IsString()
   lastName?: string;
-
   @IsOptional()
   @IsString()
   username?: string;
-
-  @IsOptional()
-  @IsString()
-  phoneNumber?: string;
-
   @IsOptional()
   @IsString()
   photoUrl?: string;
-
+  @IsOptional()
+  @IsString()
+  phoneNumber?: string;
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  themes?: string[];
+  @IsOptional()
+  @IsBoolean()
+  isStudent?: boolean;
   @IsOptional()
   @IsString()
   utmSource?: string;
-
   @IsOptional()
   @IsString()
   utmMedium?: string;
-
   @IsOptional()
   @IsString()
   utmCampaign?: string;
+  @IsOptional()
+  @IsDate() // Наше новое поле для паузы ИИ
+  aiPausedUntil?: Date;
 }

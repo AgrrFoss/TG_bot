@@ -23,7 +23,12 @@ export class ApplicationsService {
       }
     }
     user.phoneNumber = formData.phone;
-    const subscriber = await this.subscriberService.createOrUpdate(user);
+    // const subscriber = await this.subscriberService.createOrUpdate(user);
+    const { subscriber } = await this.subscriberService.findOrCreate(
+      'telegram',
+      user.id,
+      user,
+    );
     const newApplication = {
       subscriber: subscriber,
       formName: createApplicationDto.formName,

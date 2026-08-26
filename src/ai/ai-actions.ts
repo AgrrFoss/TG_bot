@@ -1,0 +1,5 @@
+export enum AiAction {
+  NONE = 'NONE',
+  NEED_MANAGER = 'NEED_MANAGER',
+  NEW_APPLICATION = 'NEW_APPLICATION',
+}
