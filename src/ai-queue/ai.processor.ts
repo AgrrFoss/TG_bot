@@ -7,7 +7,6 @@ import { parseAiResponse } from '../ai/parse-ai-response';
 import { AiAction } from '../ai/ai-actions';
 import { SubscribersService } from '../subscribers/subscribers.service';
 import { buildSystemPrompt } from '../ai/build-system-prompt';
-import { platform } from 'node:os';
 import { InjectBot } from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -64,6 +63,10 @@ export class AiProcessor {
 
     // 6. Выполняем действие
     const subscriber = await this.subscribersService.findById(subscriberId);
+    const username = await this.subscribersService.getUsernameForPlatform(
+      subscriberId,
+      platform,
+    );
     if (action === AiAction.NEED_MANAGER) {
       await this.subscribersService.updateAiPause(subscriberId, 15);
       const lastUserMessage = history
@@ -75,7 +78,7 @@ export class AiProcessor {
           '',
           `Платформа: ${platform}`,
           `Клиент: ${subscriber?.firstName || '—'} ${subscriber?.lastName || ''}`.trim(),
-          `Username: ${subscriber?.username || '—'}`,
+          `Username (${platform}): ${username}`,
           `Последнее сообщение: ${lastUserMessage || '—'}`,
         ].join('\n'),
       );
@@ -93,7 +96,7 @@ export class AiProcessor {
           '',
           `Платформа: ${platform}`,
           `Клиент: ${subscriber?.firstName || '—'} ${subscriber?.lastName || ''}`.trim(),
-          `Username: ${subscriber?.username || '—'}`,
+          `Username (${platform}): ${username}`,
           `Телефон: ${subscriber?.phoneNumber || 'не указан'}`,
           `Последнее сообщение: ${lastUserMessage || '—'}`,
         ].join('\n'),

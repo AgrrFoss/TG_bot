@@ -6,6 +6,7 @@ import { SubscribersService } from '../subscribers/subscribers.service';
 import { MessagesService } from '../messages/messages.service';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
+import { parseReferralValue } from '../subscribers/utm-parser';
 @Injectable()
 @Update()
 export class TgBotService {
@@ -22,7 +23,24 @@ export class TgBotService {
     const platformId = String(user.id);
     // Парсим deep-link параметры
     const startPayload = (ctx.message as any)?.text?.split(' ')?.[1];
-    // TODO: распарсить UTM из startPayload, если нужно
+
+    // Старый механизм парсинга UTM меток, возможно пригодится при восстановлении заявок
+    // const text = ctx.text;
+    // const pattern = /usr=|umd=|ucm=/;
+    // const includeUtm = text ? pattern.test(text) : false;
+    // const utmTerms = {
+    //   utmSource: '',
+    //   utmMedium: '',
+    //   utmCampaign: '',
+    // };
+    // if (text && includeUtm) {
+    //   const params = text?.split(' ');
+    //   const parsedUtmTerms = parseStartParams(params[1]);
+    //   utmTerms.utmSource = parsedUtmTerms.usr || '';
+    //   utmTerms.utmMedium = parsedUtmTerms.umd || '';
+    //   utmTerms.utmCampaign = parsedUtmTerms.ucm || '';
+    // }
+    const referral = startPayload ? parseReferralValue(startPayload) : {};
     // Находим или создаём подписчика
     const { subscriber } = await this.subscribersService.findOrCreate(
       'telegram',
@@ -32,12 +50,23 @@ export class TgBotService {
         lastName: user.last_name,
         username: user.username,
         photoUrl: undefined, // телеграм не даёт photoUrl напрямую
+        utmSource: referral.utmSource || undefined,
+        utmMedium: referral.utmMedium || undefined,
+        utmCampaign: referral.utmCampaign || undefined,
+
+        //     utmSource: utmTerms.utmSource,
+        //     utmMedium: utmTerms.utmMedium,
+        //     utmCampaign: utmTerms.utmCampaign,
       },
     );
     console.log(
       `TG: команда /start от ${subscriber.firstName || platformId}. UTM: ${startPayload || 'нет'}`,
     );
-    // Ответа пока не шлём — AI сам ответит на первое сообщение
+    if (user.first_name) {
+      await ctx.reply(
+        `Привет, ${user.first_name}! 👋 Добро пожаловать в студию RoyalKids.\n\nЯ помогу записать вашего ребёнка на бесплатное пробное занятие по хип-хопу и джаз-фанку. Просто напишите мне, и мы подберём удобную дату.`,
+      );
+    }
   }
 
   @On('message')
@@ -97,52 +126,4 @@ export class TgBotService {
       console.error('TG: ошибка при обработке сообщения:', error);
     }
   }
-
-  // @Start()
-  // async onStart(@Ctx() ctx: Context) {
-  //   // Проверяем, что у нас есть информация о пользователе
-  //   console.log('Что-то стартовало', ctx);
-  //   const user = ctx.from;
-  //   if (!user) {
-  //     return ctx.reply('Не удалось получить информацию о пользователе.');
-  //   }
-  //   const text = ctx.text;
-  //   const pattern = /usr=|umd=|ucm=/;
-  //   const includeUtm = text ? pattern.test(text) : false;
-  //   const utmTerms = {
-  //     utmSource: '',
-  //     utmMedium: '',
-  //     utmCampaign: '',
-  //   };
-  //   if (text && includeUtm) {
-  //     const params = text?.split(' ');
-  //     const parsedUtmTerms = parseStartParams(params[1]);
-  //     utmTerms.utmSource = parsedUtmTerms.usr || '';
-  //     utmTerms.utmMedium = parsedUtmTerms.umd || '';
-  //     utmTerms.utmCampaign = parsedUtmTerms.ucm || '';
-  //   }
-  //   const newSubscriber = {
-  //     tgId: user.id,
-  //     firstName: user.first_name || 'Неизвестно',
-  //     lastName: user.last_name || 'Неизвестно',
-  //     username: user.username || undefined,
-  //     utmSource: utmTerms.utmSource,
-  //     utmMedium: utmTerms.utmMedium,
-  //     utmCampaign: utmTerms.utmCampaign,
-  //   };
-  //   try {
-  //     const subscriber =
-  //       await this.subscribersService.createOrUpdate(newSubscriber);
-  //     console.log(`Subscriber saved/updated: ${JSON.stringify(subscriber)}`);
-  //     // Отправляем приветственное сообщение
-  //     await ctx.reply(
-  //       `Привет, ${newSubscriber.firstName}! Спасибо за подписку. Будем на связи!`,
-  //     );
-  //   } catch (error) {
-  //     console.error('Ошибка при сохранении подписчика:', error);
-  //     await ctx.reply(
-  //       'Произошла ошибка при регистрации. Пожалуйста, попробуйте позже.',
-  //     );
-  //   }
-  // }
 }

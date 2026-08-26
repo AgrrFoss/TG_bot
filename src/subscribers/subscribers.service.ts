@@ -32,7 +32,15 @@ export class SubscribersService {
         identity: existingIdentity,
       };
     }
-    const newSubscriber = this.subscriberRepository.create(dto);
+    const newSubscriber = this.subscriberRepository.create({
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      photoUrl: dto.photoUrl,
+      phoneNumber: dto.phoneNumber,
+      utmSource: dto.utmSource,
+      utmMedium: dto.utmMedium,
+      utmCampaign: dto.utmCampaign,
+    });
     const savedSubscriber = await this.subscriberRepository.save(newSubscriber);
     const newIdentity = this.identityRepository.create({
       platform: platform,
@@ -67,63 +75,15 @@ export class SubscribersService {
       aiPausedUntil: pausedUntil,
     });
   }
-  // Создание или обновление подписчика Метод рассчитанный на получение данных при работе с ТГ заявками из ТГАпп
-  // async createOrUpdate(
-  //   createSubscriberDto: CreateSubscriberDto,
-  // ): Promise<Subscriber> {
-  //   const {
-  //     id,
-  //     // tgId,
-  //     // vkId,
-  //     firstName,
-  //     lastName,
-  //     username,
-  //     phoneNumber,
-  //     photoUrl,
-  //     utmSource,
-  //     utmMedium,
-  //     utmCampaign,
-  //   } = createSubscriberDto;
-  //   let subscriber: Subscriber | null = null;
-  // if (tgId) {
-  //   subscriber = await this.subscriberRepository.findOne({ where: { tgId } });
-  // }
-  // if (!subscriber && vkId) {
-  //   subscriber = await this.subscriberRepository.findOne({ where: { vkId } });
-  // }
-  //   if (!subscriber && id) {
-  //     subscriber = await this.subscriberRepository.findOne({
-  //       where: { id },
-  //     });
-  //   }
-  //   if (subscriber) {
-  //     if (firstName !== undefined) subscriber.firstName = firstName;
-  //     if (lastName !== undefined) subscriber.lastName = lastName;
-  //     if (username !== undefined) subscriber.username = username;
-  //     if (phoneNumber !== undefined) subscriber.phoneNumber = phoneNumber;
-  //     if (photoUrl !== undefined) subscriber.photoUrl = photoUrl;
-  //     if (utmSource !== undefined) subscriber.utmSource = utmSource;
-  //     if (utmMedium !== undefined) subscriber.utmMedium = utmMedium;
-  //     if (utmCampaign !== undefined) subscriber.utmCampaign = utmCampaign;
-  //     // Важно: tgId и vkId тоже могут быть частью обновления, если они были null
-  //     // if (tgId !== undefined) subscriber.tgId = tgId;
-  //     // if (vkId !== undefined) subscriber.vkId = vkId;
-  //   } else {
-  //     subscriber = this.subscriberRepository.create({
-  //       // tgId,
-  //       // vkId,
-  //       firstName,
-  //       lastName,
-  //       username,
-  //       phoneNumber,
-  //       photoUrl,
-  //       utmSource,
-  //       utmMedium,
-  //       utmCampaign,
-  //     });
-  //   }
-  //   return this.subscriberRepository.save(subscriber);
-  // }
+  async getUsernameForPlatform(
+    subscriberId: string,
+    platform: string,
+  ): Promise<string> {
+    const identity = await this.identityRepository.findOne({
+      where: { subscriber: { id: subscriberId }, platform },
+    });
+    return identity?.username || '—';
+  }
 
   async findAll(): Promise<Subscriber[]> {
     return this.subscriberRepository.find();
@@ -133,8 +93,8 @@ export class SubscribersService {
     return this.subscriberRepository.findOne({ where: { id } });
   }
 
-  async findByUserName(username: string): Promise<Subscriber | null> {
-    return this.subscriberRepository.findOne({ where: { username } });
+  async findByUserName(username: string): Promise<SubscriberIdentity | null> {
+    return this.identityRepository.findOne({ where: { username } });
   }
 
   async update(id: string, updateSubscriberDto: UpdateSubscriberDto) {

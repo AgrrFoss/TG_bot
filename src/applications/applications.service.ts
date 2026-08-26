@@ -13,26 +13,31 @@ export class ApplicationsService {
     private readonly applicationRepository: Repository<Application>,
   ) {}
 
-  // async create(createApplicationDto: CreateApplicationDto) {
-  //   const formData = createApplicationDto.formData;
-  //   const user = createApplicationDto.userData;
-  //   const utmString = `utmSource: ${user.utmSource || null}, utmMedium: ${user.utmMedium || null}, utmCampaign: ${user.utmCampaign || null};`;
-  //   for (const key in user) {
-  //     if (key === 'utmSource' || key === 'utmMedium' || key === 'utmCampaign') {
-  //       delete user[key];
-  //     }
-  //   }
-  //   user.phoneNumber = formData.phone;
-  //   const subscriber = await this.subscriberService.createOrUpdate(user);
-  //   const newApplication = {
-  //     subscriber: subscriber,
-  //     formName: createApplicationDto.formName,
-  //     utmString,
-  //     name: formData.name,
-  //     formData: { age: formData.age },
-  //   };
-  //   return this.applicationRepository.save(newApplication);
-  // }
+  async create(createApplicationDto: CreateApplicationDto) {
+    const formData = createApplicationDto.formData;
+    const user = createApplicationDto.userData;
+    const utmString = `utmSource: ${user.utmSource || null}, utmMedium: ${user.utmMedium || null}, utmCampaign: ${user.utmCampaign || null};`;
+    for (const key in user) {
+      if (key === 'utmSource' || key === 'utmMedium' || key === 'utmCampaign') {
+        delete user[key];
+      }
+    }
+    user.phoneNumber = formData.phone;
+    // const subscriber = await this.subscriberService.createOrUpdate(user);
+    const { subscriber } = await this.subscriberService.findOrCreate(
+      'telegram',
+      user.id,
+      user,
+    );
+    const newApplication = {
+      subscriber: subscriber,
+      formName: createApplicationDto.formName,
+      utmString,
+      name: formData.name,
+      formData: { age: formData.age },
+    };
+    return this.applicationRepository.save(newApplication);
+  }
 
   async findAll() {
     return this.applicationRepository.find();

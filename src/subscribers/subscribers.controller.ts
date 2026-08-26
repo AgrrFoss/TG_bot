@@ -8,7 +8,6 @@ import {
   Get,
 } from '@nestjs/common';
 import { SubscribersService } from './subscribers.service';
-import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
 import { RemoveSeveralDto } from './dto/removeSeveral-subscribers.dto';
 
