@@ -35,6 +35,18 @@ export class MessagesService {
     return this.messageRepository.save(newMessage);
   }
 
+  async getHistoryForAi(subscribedId: string, limit = 20) {
+    const messages = await this.messageRepository.find({
+      where: { subscriber: { id: subscribedId } },
+      order: { createdAt: 'DESC' },
+      take: limit,
+    });
+    return messages.reverse().map((msg) => {
+      const role = msg.senderType === 'client' ? 'user' : 'assistant';
+      return { role, content: msg.content };
+    });
+  }
+
   findAll() {
     return `This action returns all messages`;
   }

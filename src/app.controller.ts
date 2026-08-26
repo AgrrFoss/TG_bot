@@ -15,4 +15,8 @@ export class AppController {
     console.log('hui', body);
     return '1a4b4448';
   }
+  @Get('redis-test')
+  async redisTest() {
+    return this.appService.testRedis();
+  }
 }

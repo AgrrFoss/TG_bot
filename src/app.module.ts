@@ -8,7 +8,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SubscribersModule } from './subscribers/subscribers.module';
 import SnakeNamingStrategy from 'typeorm-naming-strategy';
-import { TgBotModule } from './tgBot/tgBot.module';
+import { TgBotModule } from './tg-bot/tg-bot.module';
 // import { ApplicationsModule } from './applications/applications.module';
 import { MessagesModule } from './messages/messages.module';
 import { AdminsModule } from './admins/admins.module';
@@ -16,12 +16,23 @@ import { AuthModule } from './auth/auth.module';
 import { VkBotModule } from './vk-bot/vk-bot.module';
 import { VkBotController } from './vk-bot/vk-bot.controller';
 import { VkBotService } from './vk-bot/vk-bot.service';
+import { AiModule } from './ai/ai.module';
+import { RedisModule } from './redis/redis.module';
+import { BullModule } from '@nestjs/bull';
+import { AiQueueModule } from './ai-queue/ai-queue.module';
 
 config();
 const configService = new ConfigService();
 const configParams = {
   isGlobal: true,
   envFilePath: ['.env'],
+};
+const bullParams = {
+  redis: {
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: Number(process.env.REDIS_PORT || 6379),
+    password: process.env.REDIS_PASSWORD || undefined,
+  },
 };
 
 const typeOrmParams: TypeOrmModuleOptions = {
@@ -41,6 +52,7 @@ const typeOrmParams: TypeOrmModuleOptions = {
   imports: [
     ConfigModule.forRoot(configParams),
     TypeOrmModule.forRoot(typeOrmParams),
+    BullModule.forRoot(bullParams),
     SubscribersModule,
     TgBotModule,
     // ApplicationsModule,
@@ -48,6 +60,9 @@ const typeOrmParams: TypeOrmModuleOptions = {
     AdminsModule,
     AuthModule,
     VkBotModule,
+    AiModule,
+    RedisModule,
+    AiQueueModule,
   ],
   controllers: [AppController, VkBotController],
   providers: [AppService, VkBotService],

@@ -1,8 +1,10 @@
 import { Module, Global } from '@nestjs/common';
 import { VK } from 'vk-io';
+import { AiQueueModule } from '../ai-queue/ai-queue.module';
 
 @Global()
 @Module({
+  imports: [AiQueueModule],
   providers: [
     {
       // Используем сам класс VK как токен!

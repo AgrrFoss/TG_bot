@@ -3,11 +3,15 @@ import { VK, MessageContext } from 'vk-io';
 import { CreateSubscriberDto } from '../subscribers/dto/create-subscriber.dto';
 import { SubscribersService } from '../subscribers/subscribers.service';
 import { MessagesService } from '../messages/messages.service';
+import { parseReferralValue } from '../subscribers/utm-parser';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class VkBotService implements OnModuleInit {
   // Nest автоматически сопоставит тип VK с провайдером из VkModule
   constructor(
+    @InjectQueue('ai') private readonly aiQueue: Queue,
     private readonly vk: VK,
     private readonly subscribersService: SubscribersService,
     private readonly messagesService: MessagesService,
@@ -29,11 +33,17 @@ export class VkBotService implements OnModuleInit {
         user_ids: [context.senderId],
         fields: ['photo_200', 'screen_name'],
       });
+      const referral = context.referralValue
+        ? parseReferralValue(context.referralValue)
+        : {};
       const subscriberDto: CreateSubscriberDto = {
         firstName: vkUser?.first_name,
         lastName: vkUser?.last_name,
         username: vkUser?.screen_name,
         photoUrl: vkUser?.photo_200,
+        utmSource: referral.utmSource || context.referralSource || undefined,
+        utmMedium: referral.utmMedium || undefined,
+        utmCampaign: referral.utmCampaign || undefined,
       };
       const { subscriber, identity } =
         await this.subscribersService.findOrCreate(
@@ -62,9 +72,19 @@ export class VkBotService implements OnModuleInit {
       console.log(
         `Сообщение от ${subscriber.firstName || 'нового пользователя'} сохранено`,
       );
-      // await context.send(
-      //   'Привет! Бот на связи и я сохранил твое сообщение в базу.',
-      // );
+      const now = new Date();
+      if (subscriber.aiPausedUntil && subscriber.aiPausedUntil > now) {
+        console.log(
+          `ИИ заглушен для ${subscriber.firstName} до ${subscriber.aiPausedUntil}`,
+        );
+        return;
+      }
+      await this.aiQueue.add('process-message', {
+        subscriberId: subscriber.id,
+        peerId: context.peerId,
+        platform: 'vk',
+      });
+      console.log(`Задача для ИИ добавлена: subscriberId=${subscriber.id}`);
     } catch (error) {
       console.error('Ошибка при обработке входящего сообщения ВК:', error);
     }

@@ -14,7 +14,9 @@ export class SubscribersService {
     @InjectRepository(SubscriberIdentity)
     private readonly identityRepository: Repository<SubscriberIdentity>,
   ) {}
-
+  async findById(id: string): Promise<Subscriber | null> {
+    return this.subscriberRepository.findOne({ where: { id } });
+  }
   async findOrCreate(
     platform: string,
     platformId: string,
