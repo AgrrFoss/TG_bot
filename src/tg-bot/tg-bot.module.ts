@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TelegrafModule } from 'nestjs-telegraf';
-import { Telegraf } from 'telegraf';
 import { SubscribersModule } from '../subscribers/subscribers.module';
 import { MessagesModule } from '../messages/messages.module';
 import { TgBotService } from './tg-bot.service';
@@ -33,10 +32,8 @@ import { SocksProxyAgent } from 'socks-proxy-agent';
           launchOptions: {
             dropPendingUpdates: true, // не обрабатываем сообщения, пришедшие пока бот был офлайн
           },
-          botFactory: (botToken: string) => {
-            return new Telegraf(botToken, {
-              telegram: agent ? { agent } : undefined,
-            });
+          options: {
+            telegram: agent ? { agent } : undefined,
           },
           // В разработке webhook может быть не настроен — тогда polling
           // ...(domain
